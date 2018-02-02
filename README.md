@@ -45,6 +45,22 @@ Creating Makefile - Ensure the following before running "make run"
 To begin move to the new project directory with the command $ cd example3
 ```
 
+This will create a new folder complete with `Makefile` and a `./dockerfile` directory
+
+```
+gopro --makefile --dockerfile example4
+~~ GOPro-ject ~~
+Creating Makefile - Ensure the following before running "make run"
+
+ git init; \
+ git add *; \
+ git commit -m "My first commit" 
+
+Creating dockerfile/dockerfile
+To begin move to the new project directory with the command $ cd example4
+```
+
+
 ### Using your new project
 
 Once you've created a new project simple move to your new directory `cd <project_name>` and if you've passed the `--makefile` flag then you'll need to initialise youre project with `git`:
@@ -56,3 +72,13 @@ Once you've created a new project simple move to your new directory `cd <project
 **Makefile usage**
 
 By default running `make` (defaults to `make install`) will compile and install your the binary from your new project in `$GOPATH/bin`, alternatively `make build` and `make run` will do the obvious. 
+
+**Dockerfile usage**
+
+If you have specified the `--dockerfile` flag then the project can easily be automated to create a docker image from your new project. Use the `make docker` command and the project will be built and automated into a `scratch` container.
+
+### NOTES
+
+A `make build` will create a binary that is compatible with your local machine (i.e. the place where the code is being compiled). However a `make docker` will set the binary to be build as a Linux (ELF) binary, this is to ease development in places like Docker4Mac etc.. 
+
+To change this the Makefile can be edited by changing TARGETOS to either `darwin` / `linux` / `win`
