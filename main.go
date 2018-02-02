@@ -31,8 +31,11 @@ TARGET := %s
 VERSION := 1.0.0
 BUILD := ` + "`git rev-parse HEAD`" + `
 
+# Operating System Default (LINUX)
+TARGETOS=linux
+
 # Use linker flags to provide version/build settings to the target
-LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
+LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -s"
 
 # go source files, ignore vendor directory
 SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
@@ -59,6 +62,13 @@ uninstall: clean
 fmt:
 	@gofmt -l -w $(SRC)
 
+docker:
+	@GOOS=$(TARGETOS) make build
+	@mv $(TARGET) ./dockerfile
+	@docker build -t $(TARGET) ./dockerfile/
+	@rm ./dockerfile/$(TARGET)
+	echo "New Docker image created"
+
 simplify:
 	@gofmt -s -l -w $(SRC)
 
@@ -81,12 +91,21 @@ Additional text
 Created on %s
 `
 
+var dockerfile = `#Start from Scratch
+FROM scratch
+#Copy binary
+COPY %s %s
+#Run binary
+CMD ["./%s"]
+`
+
 type project struct {
-	readme   *bool
-	pkg      *bool
-	makefile *bool
-	cmd      *bool
-	name     string
+	readme     *bool
+	pkg        *bool
+	makefile   *bool
+	cmd        *bool
+	dockerfile *bool
+	name       string
 }
 
 func main() {
@@ -97,6 +116,7 @@ func main() {
 	p.pkg = flag.Bool("pkg", false, "Create a package directory")
 	p.makefile = flag.Bool("makefile", false, "Create a 'Makefile'")
 	p.cmd = flag.Bool("cmd", false, "Create a cmd directory")
+	p.dockerfile = flag.Bool("dockerfile", false, "Create a dockerfile directory and dockerfile to create a project container")
 
 	flag.Parse()
 
@@ -139,7 +159,6 @@ func createProject(p project) error {
 	}
 
 	if *p.cmd == true {
-		var err error
 		err = os.Mkdir(p.name+"/cmd", 0766)
 		if err != nil {
 			return err
@@ -147,7 +166,6 @@ func createProject(p project) error {
 	}
 
 	if *p.pkg == true {
-		var err error
 		err = os.Mkdir(p.name+"/pkg", 0766)
 		if err != nil {
 			return err
@@ -170,6 +188,19 @@ func createProject(p project) error {
 			return err
 		}
 		fmt.Printf("Creating Makefile - Ensure the following before running \"make run\"\n\n git init; \\\n git add *; \\\n git commit -m \"My first commit\" \n\n")
+	}
+
+	if *p.dockerfile == true {
+		err = os.Mkdir(p.name+"/dockerfile", 0766)
+		if err != nil {
+			return err
+		}
+		dockerData := []byte(fmt.Sprintf(dockerfile, p.name, p.name, p.name))
+		err = ioutil.WriteFile(p.name+"/dockerfile/dockerfile", dockerData, 0644)
+		if err != nil {
+			return err
+		}
+		fmt.Println("Creating dockerfile/dockerfile")
 	}
 	return nil
 }
