@@ -109,7 +109,7 @@ type project struct {
 }
 
 func main() {
-	fmt.Println("~~ GOPro-ject ~~")
+	fmt.Println("~~ \033[32mGOPro-ject\033[m ~~")
 	var p project
 
 	p.readme = flag.Bool("readme", false, "Create a README.md")
@@ -163,6 +163,8 @@ func createProject(p project) error {
 		if err != nil {
 			return err
 		}
+		fmt.Println("Creating \033[32mcmd\033[m directory")
+
 	}
 
 	if *p.pkg == true {
@@ -170,10 +172,11 @@ func createProject(p project) error {
 		if err != nil {
 			return err
 		}
+		fmt.Println("Creating \033[32mpkg\033[m directory")
 	}
 
 	if *p.readme == true {
-		fmt.Println("Creating README.md")
+		fmt.Println("Creating \033[32mREADME.md\033[m")
 		readmeData := []byte(fmt.Sprintf(readme, p.name, time.Now().Format("2006-01-02 15:04:05")))
 		err = ioutil.WriteFile(p.name+"/Readme.md", readmeData, 0644)
 		if err != nil {
@@ -187,7 +190,7 @@ func createProject(p project) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Creating Makefile - Ensure the following before running \"make run\"\n\n git init; \\\n git add *; \\\n git commit -m \"My first commit\" \n\n")
+		fmt.Printf("Creating \033[32mMakefile\033[m\nEnsure the following before running \"make run\"\n\n \033[32mgit init; \\\n git add *; \\\n git commit -m \"My first commit\" \033[m\n\n")
 	}
 
 	if *p.dockerfile == true {
@@ -200,7 +203,7 @@ func createProject(p project) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("Creating dockerfile/dockerfile")
+		fmt.Println("Creating \033[32mdockerfile/dockerfile\033[m")
 	}
 	return nil
 }
