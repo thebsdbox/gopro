@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/thebsdbox/gopro/examples"
 )
 
 var mainGo = `package main
@@ -15,7 +17,7 @@ import "fmt"
 
 func main() {
 
-	fmt.Printf("Skeleton for Project %s created\n")
+	fmt.Printf("Hello World for Project %s created\n")
 
 }
 `
@@ -100,12 +102,13 @@ CMD ["./%s"]
 `
 
 type project struct {
-	readme     *bool
-	pkg        *bool
-	makefile   *bool
-	cmd        *bool
-	dockerfile *bool
-	name       string
+	readme        *bool
+	pkg           *bool
+	makefile      *bool
+	cmd           *bool
+	dockerfile    *bool
+	name          string
+	exampleSource *examples.Example
 }
 
 func main() {
@@ -118,19 +121,44 @@ func main() {
 	p.cmd = flag.Bool("cmd", false, "Create a cmd directory")
 	p.dockerfile = flag.Bool("dockerfile", false, "Create a dockerfile directory and dockerfile to create a project container")
 
+	// Example code
+	listExamples := flag.Bool("listexamples", false, "List the names of the embedded examples")
+	exampleName := flag.String("example", "", "Build a new project from one of the embedded examples")
+
 	flag.Parse()
+
+	if *listExamples == true {
+		a := examples.GetAllExamples()
+		fmt.Printf("\n -- Embedded Examples --\n")
+		for _, example := range a {
+			fmt.Printf("\t%s\n", example.Name)
+		}
+		os.Exit(0)
+	}
 
 	// Check that the project name is the remaining argument, if not print out the errors
 	remArgs := flag.Args()
 	if len(remArgs) == 0 {
 		fmt.Printf("USAGE: %s [options] <project name> \n\n", filepath.Base(os.Args[0]))
-		fmt.Printf("'project name' specifies the name of the project/dir that will be created\n")
+		fmt.Printf("'project name' specifies the name of the project/dir that will be created\n\n")
 		flag.Usage()
 		os.Exit(1)
 	}
 
 	// Ensure that the project name is added to the struct
 	p.name = remArgs[0]
+
+	// Build a project from one of the examples in the ~/example folder
+	if exampleName != nil {
+		p.exampleSource = examples.GetExample(*exampleName)
+		if p.exampleSource == nil {
+			fmt.Printf("[Error] Example not found\n")
+			os.Exit(1)
+		}
+	} else {
+		// DEFAULT - Use the hello world example
+		p.exampleSource = examples.GetExample("hello")
+	}
 
 	err := createProject(p)
 	if err != nil {
