@@ -1,12 +1,13 @@
 package examples
 
+// The default Hello World example
 var exampleHelloWorld = `package main
 
 import "fmt"
 
 func main() {
 
-	fmt.Printf("Hello World for Project %s created\n")
+	fmt.Printf("Hello World for your new project created\n")
 
 }
 `
