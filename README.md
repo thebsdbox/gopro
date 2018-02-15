@@ -60,6 +60,9 @@ Creating dockerfile/dockerfile
 To begin move to the new project directory with the command $ cd example4
 ```
 
+### Examples
+There are now a few embedded examples that will create a skeleton project with some basic functions for a few use cases. To view the embedded examples use the command `gopro -listexamples` and when building a new project just specify the example that you would like to create with the `-example <example_name>` flag. The Examples can be found in the `/example` folder as part of the source tree.
+
 
 ### Using your new project
 
