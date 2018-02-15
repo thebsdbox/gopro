@@ -11,17 +11,6 @@ import (
 	"github.com/thebsdbox/gopro/examples"
 )
 
-var mainGo = `package main
-
-import "fmt"
-
-func main() {
-
-	fmt.Printf("Hello World for Project %s created\n")
-
-}
-`
-
 var makefile = `
 SHELL := /bin/bash
 
@@ -149,7 +138,7 @@ func main() {
 	p.name = remArgs[0]
 
 	// Build a project from one of the examples in the ~/example folder
-	if exampleName != nil {
+	if *exampleName != "" {
 		p.exampleSource = examples.GetExample(*exampleName)
 		if p.exampleSource == nil {
 			fmt.Printf("[Error] Example not found\n")
@@ -180,8 +169,8 @@ func createProject(p project) error {
 		return err
 	}
 
-	goData := []byte(fmt.Sprintf(mainGo, p.name))
-	err = ioutil.WriteFile(p.name+"/main.go", goData, 0644)
+	// Iterate through source files and write them to disk
+	err = writeSourceCodeToDisk(p)
 	if err != nil {
 		return err
 	}
@@ -232,6 +221,17 @@ func createProject(p project) error {
 			return err
 		}
 		fmt.Println("Creating \033[32mdockerfile/dockerfile\033[m")
+	}
+	return nil
+}
+
+func writeSourceCodeToDisk(p project) error {
+	for _, s := range p.exampleSource.SourceFiles {
+		goData := []byte(s.Code)
+		err := ioutil.WriteFile(p.name+"/"+s.Filename, goData, 0644)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

@@ -1,8 +1,7 @@
 package examples
 
 // examplewebserver - this is a simple webserving application
-var exampleWebserverCode = `
-package main
+var exampleWebserverCode = `package main
 
 import (
 	"io"
