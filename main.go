@@ -31,6 +31,8 @@ LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -s"
 # go source files, ignore vendor directory
 SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
+DOCKERTAG=latest
+
 .PHONY: all build clean install uninstall fmt simplify check run
 
 all: check install
@@ -56,9 +58,9 @@ fmt:
 docker:
 	@GOOS=$(TARGETOS) make build
 	@mv $(TARGET) ./dockerfile
-	@docker build -t $(TARGET) ./dockerfile/
+	@docker build -t $(TARGET):$(DOCKERTAG) ./dockerfile/
 	@rm ./dockerfile/$(TARGET)
-	echo "New Docker image created"
+	@echo New Docker image created
 
 simplify:
 	@gofmt -s -l -w $(SRC)
