@@ -47,6 +47,7 @@ clean:
 	@rm -f $(TARGET)
 
 install:
+	@echo Building and Installing project
 	@go install $(LDFLAGS)
 
 uninstall: clean
@@ -118,7 +119,9 @@ func main() {
 
 	flag.Parse()
 
+	// Read all embedded example names and print them out
 	if *listExamples == true {
+		examples.Init("")
 		a := examples.GetAllExamples()
 		fmt.Printf("\n -- Embedded Examples --\n")
 		for _, example := range a {
@@ -138,6 +141,9 @@ func main() {
 
 	// Ensure that the project name is added to the struct
 	p.name = remArgs[0]
+
+	// Initialise the examples with a project name
+	examples.Init(p.name)
 
 	// Build a project from one of the examples in the ~/example folder
 	if *exampleName != "" {
@@ -171,12 +177,6 @@ func createProject(p project) error {
 		return err
 	}
 
-	// Iterate through source files and write them to disk
-	err = writeSourceCodeToDisk(p)
-	if err != nil {
-		return err
-	}
-
 	if *p.cmd == true {
 		err = os.Mkdir(p.name+"/cmd", 0766)
 		if err != nil {
@@ -192,6 +192,18 @@ func createProject(p project) error {
 			return err
 		}
 		fmt.Println("Creating \033[32mpkg\033[m directory")
+	}
+
+	// Iterate through source files and write them to disk
+	err = writeSourceCodeToDisk(p)
+	if err != nil {
+		return err
+	}
+
+	// Iterate through package source files and write them to disk
+	err = writePackageSourceCodeToDisk(p)
+	if err != nil {
+		return err
 	}
 
 	if *p.readme == true {
@@ -231,6 +243,21 @@ func writeSourceCodeToDisk(p project) error {
 	for _, s := range p.exampleSource.SourceFiles {
 		goData := []byte(s.Code)
 		err := ioutil.WriteFile(p.name+"/"+s.Filename, goData, 0644)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func writePackageSourceCodeToDisk(p project) error {
+	if *p.pkg == false {
+		fmt.Printf("[ERROR] the -pkg flag wasn't passed\n")
+		os.Exit(1)
+	}
+	for _, s := range p.exampleSource.PackageFiles {
+		goData := []byte(s.Code)
+		err := ioutil.WriteFile(p.name+"/pkg/"+s.Filename, goData, 0644)
 		if err != nil {
 			return err
 		}
