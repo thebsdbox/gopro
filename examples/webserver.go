@@ -17,9 +17,9 @@ func main() {
 	http.ListenAndServe(":8000", nil)
 }`
 
-func (examples *Examples) addWebServer() {
+func (examples *Examples) addWebServer(project string) {
 	var webServer Example
 	webServer.Name = "webserver"
-	webServer.addFile("webserver.go", exampleWebserverCode)
+	webServer.addSourceFile("webserver.go", exampleWebserverCode)
 	examples.addExample(webServer)
 }

@@ -12,9 +12,9 @@ func main() {
 }
 `
 
-func (examples *Examples) addHello() {
+func (examples *Examples) addHello(project string) {
 	var hello Example
 	hello.Name = "hello"
-	hello.addFile("hello.go", exampleHelloWorld)
+	hello.addSourceFile("hello.go", exampleHelloWorld)
 	examples.addExample(hello)
 }
