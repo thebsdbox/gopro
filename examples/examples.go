@@ -48,15 +48,19 @@ func Init(project string) {
 	examples.addWebServer(project)
 	examples.addHello(project)
 	examples.addPackage(project)
+	examples.addThreads(project)
 }
 
 // BuildPackagePath - This will build the correct path to be used for any imports
 func (examples *Examples) BuildPackagePath(projectName string) string {
+	// build path from where we are
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
+	// Get current path but remove $Home + go/src/
 	currentPath := strings.Replace(dir, os.Getenv("GOPATH")+"/src/", "", 1)
+	// Append the project name to the path
 	packagePath := fmt.Sprintf("%s/%s", currentPath, projectName)
 	return packagePath
 }

@@ -201,9 +201,11 @@ func createProject(p project) error {
 	}
 
 	// Iterate through package source files and write them to disk
-	err = writePackageSourceCodeToDisk(p)
-	if err != nil {
-		return err
+	if len(p.exampleSource.PackageFiles) != 0 {
+		err = writePackageSourceCodeToDisk(p)
+		if err != nil {
+			return err
+		}
 	}
 
 	if *p.readme == true {
@@ -251,12 +253,14 @@ func writeSourceCodeToDisk(p project) error {
 }
 
 func writePackageSourceCodeToDisk(p project) error {
+	// Check that a package directory is being created
 	if *p.pkg == false {
 		fmt.Printf("[ERROR] the -pkg flag wasn't passed\n")
 		os.Exit(1)
 	}
 	for _, s := range p.exampleSource.PackageFiles {
 		goData := []byte(s.Code)
+		// write code to the package directory
 		err := ioutil.WriteFile(p.name+"/pkg/"+s.Filename, goData, 0644)
 		if err != nil {
 			return err
