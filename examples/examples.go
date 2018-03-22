@@ -43,12 +43,13 @@ func (examples *Examples) addExample(newExample Example) {
 	examples.Example = append(examples.Example, newExample)
 }
 
-// Init - This will initialise all of the examples and set any per project settings
+// Init - This will initialize all of the examples and set any per project settings
 func Init(project string) {
 	examples.addWebServer(project)
 	examples.addHello(project)
 	examples.addPackage(project)
 	examples.addThreads(project)
+	examples.addFile(project)
 }
 
 // BuildPackagePath - This will build the correct path to be used for any imports
